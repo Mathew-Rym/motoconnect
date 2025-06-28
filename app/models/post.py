@@ -5,6 +5,6 @@ class Post(db.Model):
     title = db.Column(db.String(100))
     content = db.Column(db.Text)
     tags = db.Column(db.PickleType)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
     comments = db.relationship('Comment', backref='post', lazy=True)

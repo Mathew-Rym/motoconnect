@@ -8,4 +8,4 @@ class Part(db.Model):
     condition = db.Column(db.String(50))
     description = db.Column(db.Text)
     images = db.Column(db.PickleType)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)

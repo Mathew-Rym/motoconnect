@@ -10,7 +10,7 @@ class Motorbike(db.Model):
     description = db.Column(db.Text)
     location = db.Column(db.String(100))
     images = db.Column(db.PickleType)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
     reviews = db.relationship('Review', backref='motorbike', lazy=True)
     maintenance_records = db.relationship('MaintenanceRecord', backref='motorbike', lazy=True)

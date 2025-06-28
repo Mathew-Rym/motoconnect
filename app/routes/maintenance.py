@@ -1,25 +1,42 @@
 from flask import Blueprint, request, jsonify
 from app import db
 from app.models.maintenance import MaintenanceRecord
-from flask_jwt_extended import jwt_required, get_jwt_identity
 
 maintenance_bp = Blueprint('maintenance', __name__)
-
 @maintenance_bp.route('/maintenance', methods=['GET'])
 def get_maintenance():
     records = MaintenanceRecord.query.all()
-    return jsonify([{"id": r.id, "type": r.type, "mileage": r.mileage} for r in records])
+    return jsonify([
+        {
+            "id": r.id,
+            "date": r.date,
+            "maintenance_type": r.maintenance_type,
+            "notes": r.notes,
+            "cost": r.cost,
+            "mileage": r.mileage,
+            "bike_id": r.bike_id,
+            "user_id": r.user_id
+        } for r in records
+    ]), 200
 
 @maintenance_bp.route('/maintenance', methods=['POST'])
-@jwt_required()
 def add_maintenance():
     data = request.get_json()
-    user_id = get_jwt_identity()
+
+    required_fields = ['date', 'maintenance_type', 'notes', 'cost', 'mileage', 'bike_id', 'user_id']
+    if not all(field in data for field in required_fields):
+        return jsonify({"error": "Missing required fields"}), 400
+
     record = MaintenanceRecord(
-        date=data["date"], type=data["type"], notes=data["notes"],
-        cost=data["cost"], mileage=data["mileage"],
-        bike_id=data["bike_id"], user_id=user_id
+        date=data['date'],
+        maintenance_type=data['maintenance_type'],
+        notes=data['notes'],
+        cost=data['cost'],
+        mileage=data['mileage'],
+        bike_id=data['bike_id'],
+        user_id=data['user_id']
     )
+
     db.session.add(record)
     db.session.commit()
     return jsonify({"message": "Maintenance record added"}), 201
