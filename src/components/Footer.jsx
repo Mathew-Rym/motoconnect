@@ -1,18 +1,17 @@
-// src/components/Footer.jsx
-
 function Footer() {
   return (
-    <footer className="mt-20 text-center text-gray-500 py-6 border-t">
-      <p>Follow Us on Social Media</p>
-      <p>Contact Us: support@motoconnect.com</p>
-      <p>
-        &copy; {new Date().getFullYear()} MotoConnect. All rights reserved.
-      </p>
+    <footer className="bg-light text-dark mt-auto py-4 border-top text-center">
+      <div className="container">
+        <p className="mb-1">Follow Us on Social Media</p>
+        <p className="mb-1">
+          Contact Us: <a href="mailto:support@motoconnect.com">support@motoconnect.com</a>
+        </p>
+        <p className="small mb-0">
+          &copy; {new Date().getFullYear()} MotoConnect. All rights reserved.
+        </p>
+      </div>
     </footer>
   );
 }
 
 export default Footer;
-// This code defines a simple Footer component that displays the current year and a copyright notice.
-// It uses the current date to dynamically set the year, ensuring that it is always up-to-date. The footer is styled with Tailwind CSS classes for consistent design with the rest of the application  {/* Footer */}
-      

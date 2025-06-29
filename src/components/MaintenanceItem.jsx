@@ -1,15 +1,16 @@
-// src/components/MaintenanceItem.jsx
 function MaintenanceItem({ record }) {
   return (
-    <div className="border p-4 rounded shadow-sm mb-4 bg-white dark:bg-gray-800">
-      <div className="flex justify-between items-center mb-2">
-        <h3 className="font-semibold text-lg">{record.title}</h3>
-        <span className="text-sm text-gray-500">
-          {new Date(record.date).toLocaleDateString()}
-        </span>
+    <div className="card mb-3 shadow-sm">
+      <div className="card-body bg-light">
+        <div className="d-flex justify-content-between align-items-center mb-2">
+          <h5 className="card-title mb-0">{record.title}</h5>
+          <small className="text-muted">
+            {new Date(record.date).toLocaleDateString()}
+          </small>
+        </div>
+        <p className="card-text">{record.notes}</p>
+        <p className="card-text text-muted mt-2">Cost: Ksh {record.cost}</p>
       </div>
-      <p className="text-gray-700 dark:text-gray-300">{record.notes}</p>
-      <p className="text-sm text-gray-600 mt-2">Cost: Ksh {record.cost}</p>
     </div>
   );
 }

@@ -1,32 +1,73 @@
-// src/pages/Bikes.jsx
 import React, { useEffect, useState } from 'react';
-
-const mockBikes = [
-  { id: 1, name: 'Yamaha R1', year: 2021, price: 12000 },
-  { id: 2, name: 'KTM Duke 390', year: 2022, price: 5500 },
-  { id: 3, name: 'Honda CBR 500R', year: 2020, price: 6300 },
-];
+import api from '../api/axios'; // ✅ import the configured Axios instance
 
 function Bikes() {
   const [bikes, setBikes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Simulate fetching from backend
-    setTimeout(() => {
-      setBikes(mockBikes);
-    }, 500);
+    const fetchBikes = async () => {
+      try {
+        const response = await api.get('/bikes'); // ✅ Axios call
+        setBikes(response.data); // Adjust based on backend response shape
+      } catch (error) {
+        console.error('Error fetching bikes:', error);
+        setError('Failed to load bikes. Showing sample data.');
+
+        // Fallback mock data
+        setBikes([
+          {
+            id: 1,
+            brand: 'Yamaha',
+            model: 'R1',
+            year: 2021,
+            price: 12000,
+            mileage: 5000,
+            location: 'Nairobi'
+          },
+          {
+            id: 2,
+            brand: 'KTM',
+            model: 'Duke 390',
+            year: 2022,
+            price: 5500,
+            mileage: 3000,
+            location: 'Mombasa'
+          },
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBikes();
   }, []);
 
   return (
-<div className="bg-white dark:bg-gray-700 p-4 rounded shadow transition-colors duration-300">
-      <h2 className="text-2xl font-bold mb-6">Available Bikes</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {bikes.map(bike => (
-          <div key={bike.id} className="border rounded p-4 shadow">
-            <h3 className="text-xl font-semibold">{bike.name}</h3>
-            <p className="text-gray-600">Year: {bike.year}</p>
-            <p className="text-green-600 font-bold">${bike.price}</p>
-<button className="px-3 py-2 rounded bg-gray-200 dark:bg-gray-800 text-black dark:text-white transition-colors duration-300">View</button>
+    <div className="container py-5">
+      <h2 className="text-center mb-4 fw-bold">Available Bikes</h2>
+
+      {loading && <p className="text-center">Loading bikes...</p>}
+      {error && <div className="alert alert-warning text-center">{error}</div>}
+
+      <div className="row g-4">
+        {bikes.map((bike) => (
+          <div key={bike.id} className="col-sm-6 col-md-4">
+            <div className="card h-100 shadow-sm">
+              <div className="card-body d-flex flex-column justify-content-between">
+                <div>
+                  <h5 className="card-title">{bike.brand} {bike.model}</h5>
+                  <p className="card-text mb-1">Year: {bike.year}</p>
+                  <p className="card-text mb-1">Mileage: {bike.mileage.toLocaleString()} km</p>
+                  <p className="card-text mb-1">Location: {bike.location}</p>
+                  <p className="text-success fw-bold mt-2">Ksh {bike.price.toLocaleString()}</p>
+                </div>
+                <a href={`/bikes/${bike.id}`} className="btn btn-primary mt-3 w-100">
+                  View Details
+                </a>
+              </div>
+            </div>
           </div>
         ))}
       </div>
@@ -35,6 +76,3 @@ function Bikes() {
 }
 
 export default Bikes;
-// This Bikes component fetches a list of bikes and displays them in a grid format.
-// Each bike shows its name, year, price, and a button to view more details.
-// The mockBikes array simulates the data that would typically come from a backend API.

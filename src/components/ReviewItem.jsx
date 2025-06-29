@@ -1,17 +1,19 @@
-// src/components/ReviewItem.jsx
 function ReviewItem({ review }) {
   return (
-    <div className="border rounded p-4 shadow-sm mb-4 bg-white dark:bg-gray-800">
-      <div className="flex items-center justify-between mb-2">
-        <h4 className="font-semibold">{review.user}</h4>
-        <span className="text-yellow-500">⭐ {review.rating}/5</span>
+    <div className="card mb-3 shadow-sm">
+      <div className="card-body bg-light">
+        <div className="d-flex justify-content-between mb-2">
+          <h5 className="card-title mb-0">{review.user}</h5>
+          <span className="text-warning fw-semibold">⭐ {review.rating}/5</span>
+        </div>
+        <p className="card-text">{review.comment}</p>
+        <p className="text-muted small mb-0">
+          {new Date(review.date).toLocaleDateString()}
+        </p>
       </div>
-      <p className="text-gray-700 dark:text-gray-300">{review.comment}</p>
-      <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-        {new Date(review.date).toLocaleDateString()}
-      </p>
     </div>
   );
 }
 
 export default ReviewItem;
+

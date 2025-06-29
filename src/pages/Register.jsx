@@ -1,9 +1,9 @@
-// src/pages/Register.jsx
 import { useContext } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { AuthContext } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import api from '../api/axios'; // 🔥 Axios instance
 
 const RegisterSchema = Yup.object().shape({
   username: Yup.string().min(3, 'Too short').required('Required'),
@@ -17,68 +17,99 @@ function Register() {
 
   const handleRegister = async (values, { setSubmitting, setErrors }) => {
     try {
-      const res = await fetch('http://localhost:5000/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(values),
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Registration failed');
-
-      login(data.user); // Automatically log in after register
+      const res = await api.post('/register', values); // 👈 Axios POST
+      login(res.data.user);
       navigate('/dashboard');
     } catch (err) {
-      setErrors({ general: err.message });
+      const message =
+        err.response?.data?.message || err.message || 'Registration failed';
+      setErrors({ general: message });
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
-    <div className="max-w-md mx-auto mt-16 p-6 bg-white shadow rounded">
-      <h2 className="text-xl font-bold mb-4">Register</h2>
+    <div className="container py-5 d-flex align-items-center justify-content-center min-vh-100 bg-light">
+      <div className="card shadow w-100" style={{ maxWidth: '450px' }}>
+        <div className="card-body">
+          <h2 className="card-title text-center mb-4">Create Account</h2>
 
-      <Formik
-        initialValues={{ username: '', email: '', password: '' }}
-        validationSchema={RegisterSchema}
-        onSubmit={handleRegister}
-      >
-        {({ isSubmitting, errors }) => (
-          <Form className="space-y-4">
-            {errors.general && <div className="text-red-500">{errors.general}</div>}
+          <Formik
+            initialValues={{ username: '', email: '', password: '' }}
+            validationSchema={RegisterSchema}
+            onSubmit={handleRegister}
+          >
+            {({ isSubmitting, errors }) => (
+              <Form>
+                {errors.general && (
+                  <div className="alert alert-danger text-center" role="alert">
+                    {errors.general}
+                  </div>
+                )}
 
-            <div>
-              <label className="block mb-1">Username</label>
-              <Field name="username" className="w-full border p-2 rounded" />
-              <ErrorMessage name="username" component="div" className="text-red-500 text-sm" />
-            </div>
+                <div className="mb-3">
+                  <label htmlFor="username" className="form-label">
+                    Username
+                  </label>
+                  <Field
+                    name="username"
+                    id="username"
+                    placeholder="Enter your name"
+                    className="form-control"
+                  />
+                  <ErrorMessage name="username" component="div" className="text-danger small mt-1" />
+                </div>
 
-            <div>
-              <label className="block mb-1">Email</label>
-              <Field name="email" type="email" className="w-full border p-2 rounded" />
-              <ErrorMessage name="email" component="div" className="text-red-500 text-sm" />
-            </div>
+                <div className="mb-3">
+                  <label htmlFor="email" className="form-label">
+                    Email
+                  </label>
+                  <Field
+                    name="email"
+                    type="email"
+                    id="email"
+                    placeholder="you@example.com"
+                    className="form-control"
+                  />
+                  <ErrorMessage name="email" component="div" className="text-danger small mt-1" />
+                </div>
 
-            <div>
-              <label className="block mb-1">Password</label>
-              <Field name="password" type="password" className="w-full border p-2 rounded" />
-              <ErrorMessage name="password" component="div" className="text-red-500 text-sm" />
-            </div>
+                <div className="mb-4">
+                  <label htmlFor="password" className="form-label">
+                    Password
+                  </label>
+                  <Field
+                    name="password"
+                    type="password"
+                    id="password"
+                    placeholder="••••••••"
+                    className="form-control"
+                  />
+                  <ErrorMessage name="password" component="div" className="text-danger small mt-1" />
+                </div>
 
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700"
-            >
-              {isSubmitting ? 'Registering...' : 'Register'}
-            </button>
-          </Form>
-        )}
-      </Formik>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className={`btn btn-success w-100 ${isSubmitting ? 'disabled' : ''}`}
+                >
+                  {isSubmitting ? 'Registering...' : 'Register'}
+                </button>
+
+                <p className="text-center mt-3 small">
+                  Already have an account?{' '}
+                  <Link to="/login" className="text-decoration-none text-success fw-semibold">
+                    Log in
+                  </Link>
+                </p>
+              </Form>
+            )}
+          </Formik>
+        </div>
+      </div>
     </div>
   );
 }
 
 export default Register;
-// This code defines a Register component that allows users to create a new account.

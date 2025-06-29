@@ -16,11 +16,13 @@ function Gear() {
   }, []);
 
   return (
-    <div className="max-w-5xl mx-auto mt-16 px-4">
-      <h2 className="text-2xl font-bold mb-6">Available Riding Gear</h2>
-      <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
+    <div className="container py-5">
+      <h2 className="mb-4 fw-bold">Available Riding Gear</h2>
+      <div className="row g-4">
         {gear.map((item) => (
-          <GearItem key={item.id} gear={item} />
+          <div key={item.id} className="col-12 col-sm-6 col-md-4">
+            <GearItem gear={item} />
+          </div>
         ))}
       </div>
     </div>

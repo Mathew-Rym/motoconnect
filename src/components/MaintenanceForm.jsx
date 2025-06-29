@@ -1,4 +1,3 @@
-// src/components/MaintenanceForm.jsx
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 
@@ -20,54 +19,51 @@ function MaintenanceForm({ onSubmit }) {
       }}
     >
       {() => (
-        <Form className="space-y-4">
-          <div>
-            <label className="block font-medium">Title</label>
+        <Form className="mb-4">
+          <div className="mb-3">
+            <label className="form-label">Title</label>
             <Field
               name="title"
-              className="w-full border px-3 py-2 rounded"
+              className="form-control"
               placeholder="e.g. Oil Change"
             />
-            <ErrorMessage name="title" component="div" className="text-red-600 text-sm" />
+            <ErrorMessage name="title" component="div" className="text-danger small" />
           </div>
 
-          <div>
-            <label className="block font-medium">Date</label>
+          <div className="mb-3">
+            <label className="form-label">Date</label>
             <Field
               name="date"
               type="date"
-              className="w-full border px-3 py-2 rounded"
+              className="form-control"
             />
-            <ErrorMessage name="date" component="div" className="text-red-600 text-sm" />
+            <ErrorMessage name="date" component="div" className="text-danger small" />
           </div>
 
-          <div>
-            <label className="block font-medium">Cost (Ksh)</label>
+          <div className="mb-3">
+            <label className="form-label">Cost (Ksh)</label>
             <Field
               name="cost"
               type="number"
-              className="w-full border px-3 py-2 rounded"
+              className="form-control"
               placeholder="e.g. 1500"
             />
-            <ErrorMessage name="cost" component="div" className="text-red-600 text-sm" />
+            <ErrorMessage name="cost" component="div" className="text-danger small" />
           </div>
 
-          <div>
-            <label className="block font-medium">Notes</label>
+          <div className="mb-3">
+            <label className="form-label">Notes</label>
             <Field
               name="notes"
               as="textarea"
               rows="3"
-              className="w-full border px-3 py-2 rounded"
+              className="form-control"
               placeholder="What was done?"
             />
-            <ErrorMessage name="notes" component="div" className="text-red-600 text-sm" />
+            <ErrorMessage name="notes" component="div" className="text-danger small" />
           </div>
 
-          <button
-            type="submit"
-            className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
-          >
+          <button type="submit" className="btn btn-primary">
             Add Record
           </button>
         </Form>

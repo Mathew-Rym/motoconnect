@@ -1,38 +1,66 @@
-// src/pages/PartDetails.jsx
 import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-
-const mockParts = [
-  { id: 1, name: 'Front Brake Pads', condition: 'New', price: 1800, description: 'High-performance front brake pads for better stopping power.' },
-  { id: 2, name: 'Sport Exhaust', condition: 'Used', price: 4500, description: 'Boosts sound and performance, previously used for 6 months.' },
-  { id: 3, name: 'Chain & Sprocket Kit', condition: 'New', price: 3500, description: 'Complete kit for long-distance reliability.' },
-];
+import api from '../api/axios';
 
 function PartDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [part, setPart] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const found = mockParts.find(p => p.id === parseInt(id));
-    if (found) setPart(found);
-    else navigate('/parts');
+    const fetchPart = async () => {
+      try {
+        const res = await api.get(`/parts/${id}`);
+        setPart(res.data); // Adjust if your API wraps response in another object
+      } catch (err) {
+        console.error('Part not found', err);
+        navigate('/parts'); // redirect if not found or error
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPart();
   }, [id, navigate]);
 
-  if (!part) return <div className="p-8 text-center">Loading part details...</div>;
+  if (loading) {
+    return (
+      <div className="container py-5 text-center">
+        <div className="spinner-border text-secondary" role="status" />
+        <p className="mt-3">Loading part details...</p>
+      </div>
+    );
+  }
+
+  if (!part) return null; // fallback if part fails to load
 
   return (
-    <div className="max-w-3xl mx-auto mt-16 px-4">
-      <h2 className="text-3xl font-bold mb-4">{part.name}</h2>
-      <p className="text-gray-600 mb-2">Condition: <span className="font-semibold">{part.condition}</span></p>
-      <p className="text-green-700 font-semibold text-lg mb-4">Ksh {part.price}</p>
-      <p className="mb-6">{part.description}</p>
-      <button
-        onClick={() => navigate('/parts')}
-        className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
-      >
-        Back to Parts
-      </button>
+    <div className="container py-5">
+      <div className="card shadow p-4 mx-auto" style={{ maxWidth: '600px' }}>
+        <h2 className="card-title h4 text-center mb-3">{part.name}</h2>
+
+        <ul className="list-group list-group-flush mb-4">
+          <li className="list-group-item">
+            <strong>Condition:</strong> {part.condition}
+          </li>
+          <li className="list-group-item">
+            <strong>Price:</strong> <span className="text-success fw-bold">Ksh {part.price}</span>
+          </li>
+          <li className="list-group-item">
+            <strong>Description:</strong> {part.description}
+          </li>
+        </ul>
+
+        <div className="d-grid">
+          <button
+            onClick={() => navigate('/parts')}
+            className="btn btn-primary"
+          >
+            Back to Parts
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

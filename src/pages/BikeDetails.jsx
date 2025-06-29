@@ -1,34 +1,71 @@
-// src/pages/BikeDetails.jsx
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-
-const mockBikes = [
-  { id: 1, name: 'Yamaha R3', price: 420000, description: 'Lightweight sport bike, great for beginners', year: 2020, seller: 'biker_jane' },
-  { id: 2, name: 'KTM Duke 200', price: 370000, description: 'Sharp design, great torque, fun ride', year: 2019, seller: 'moto_guy' },
-  { id: 3, name: 'Honda CBR500R', price: 490000, description: 'Perfect balance of power and control', year: 2021, seller: 'rider_ke' },
-];
+import api from '../api/axios'; // ✅ Import your Axios instance
 
 function BikeDetails() {
   const { id } = useParams();
   const [bike, setBike] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    const found = mockBikes.find((b) => b.id === parseInt(id));
-    setTimeout(() => setBike(found), 300);
+    const fetchBike = async () => {
+      try {
+        const res = await api.get(`/bikes/${id}`);
+        setBike(res.data); // Ensure your backend returns a single bike object
+      } catch (err) {
+        console.error('Error fetching bike:', err);
+        setError('Could not load bike details.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBike();
   }, [id]);
 
-  if (!bike) return <div className="p-8 text-center">Loading bike details...</div>;
+  if (loading) {
+    return (
+      <div className="container text-center py-5">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading bike details...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container text-center py-5">
+        <div className="alert alert-danger">{error}</div>
+      </div>
+    );
+  }
+
+  if (!bike) {
+    return (
+      <div className="container text-center py-5">
+        <p className="text-muted">Bike not found.</p>
+      </div>
+    );
+  }
 
   return (
-<div className="bg-white dark:bg-gray-700 p-4 rounded shadow transition-colors duration-300">
-      <h2 className="text-2xl font-bold mb-4">{bike.name}</h2>
-      <p className="text-gray-700 mb-2">{bike.description}</p>
-      <p className="text-sm text-gray-500">Year: {bike.year}</p>
-      <p className="text-green-700 font-semibold text-lg mb-2">Ksh {bike.price}</p>
-      <p className="text-sm">Seller: <span className="font-medium">{bike.seller}</span></p>
+    <div className="container py-5">
+      <div className="card shadow">
+        <div className="card-body">
+          <h2 className="card-title h4">{bike.name}</h2>
+          <p className="card-text mb-2">{bike.description}</p>
+          <ul className="list-group list-group-flush mb-3">
+            <li className="list-group-item">Year: <strong>{bike.year}</strong></li>
+            <li className="list-group-item">Seller: <strong>{bike.seller}</strong></li>
+          </ul>
+          <p className="text-success fw-bold fs-5">Ksh {bike.price?.toLocaleString()}</p>
+          <button className="btn btn-primary mt-3">Contact Seller</button>
+        </div>
+      </div>
     </div>
   );
 }
 
 export default BikeDetails;
-// This component represents a detailed view of a specific bike.

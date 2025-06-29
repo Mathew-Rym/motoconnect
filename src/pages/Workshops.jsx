@@ -1,42 +1,62 @@
-// src/pages/Workshops.jsx
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-
-const mockWorkshops = [
-  { id: 1, name: 'MotoFix Garage', location: 'Nairobi', rating: 4.8 },
-  { id: 2, name: 'SpeedTune Works', location: 'Mombasa', rating: 4.5 },
-  { id: 3, name: 'BikeDoctor Hub', location: 'Kisumu', rating: 4.6 },
-];
+import api from '../api/axios'; // ✅ import Axios instance
 
 function Workshops() {
   const [workshops, setWorkshops] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    setTimeout(() => setWorkshops(mockWorkshops), 400);
+    const fetchWorkshops = async () => {
+      try {
+        const res = await api.get('/workshops'); // ⬅️ adjust the endpoint as needed
+        setWorkshops(res.data);
+      } catch (err) {
+        console.error('Failed to fetch workshops:', err);
+        setError('Unable to load workshops. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchWorkshops();
   }, []);
 
   return (
-    <div className="max-w-4xl mx-auto mt-16 px-4">
-      <h2 className="text-2xl font-bold mb-6">Recommended Workshops</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {workshops.map(workshop => (
-          <div key={workshop.id} className="border rounded p-4 shadow">
-            <h3 className="text-xl font-semibold">{workshop.name}</h3>
-            <p className="text-gray-600">{workshop.location}</p>
-            <p className="text-yellow-600 font-medium">Rating: {workshop.rating}⭐</p>
-            <Link
-              to={`/workshops/${workshop.id}`}
-              className="mt-2 inline-block bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700"
-            >
-              View Details
-            </Link>
-          </div>
-        ))}
-      </div>
+    <div className="container py-5">
+      <h2 className="mb-4 text-center fw-bold">Recommended Workshops</h2>
+
+      {loading ? (
+        <div className="text-center">
+          <div className="spinner-border text-primary" role="status"></div>
+          <p className="mt-3">Loading workshops...</p>
+        </div>
+      ) : error ? (
+        <div className="alert alert-danger text-center">{error}</div>
+      ) : (
+        <div className="row">
+          {workshops.map((workshop) => (
+            <div className="col-md-4 mb-4" key={workshop.id}>
+              <div className="card h-100 shadow-sm">
+                <div className="card-body">
+                  <h5 className="card-title">{workshop.name}</h5>
+                  <p className="card-text text-muted mb-1">{workshop.location}</p>
+                  <p className="card-text text-warning mb-3">Rating: {workshop.rating} ⭐</p>
+                  <Link
+                    to={`/workshops/${workshop.id}`}
+                    className="btn btn-primary btn-sm"
+                  >
+                    View Details
+                  </Link>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
 
 export default Workshops;
-// This component represents a workshops page where users can view recommended workshops.
-// It uses mock data to simulate workshop listings and includes a link to view details for each workshop

@@ -1,25 +1,30 @@
-
-
-// src/main.jsx
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import App from './App.jsx';
 import { BrowserRouter } from 'react-router-dom';
-import App from './App';
-import './index.css'; // Tailwind styles
-import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
+import Cart from './pages/Cart.jsx';
+import { CartProvider } from './context/CartContext';
+
+
+import 'bootstrap/dist/css/bootstrap.min.css';          // ✅ Bootstrap CSS
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';     // ✅ Bootstrap JS (with Popper)
+import './index.css';                                   // ✅ Your own styles (optional)
+
+
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <ThemeProvider>
-    <AuthProvider>
     <BrowserRouter>
+      <CartProvider>
+      <AuthProvider>
+        <ThemeProvider>
           <App />
+        </ThemeProvider>
+      </AuthProvider>
+      </CartProvider>
     </BrowserRouter>
-    </AuthProvider>
-    </ThemeProvider>
   </React.StrictMode>
 );
 
-// This code sets up the main entry point for a React application, wrapping the App component with BrowserRouter and AuthProvider for routing and authentication context management.
-// It uses React 18's createRoot API for rendering, ensuring the app is ready for

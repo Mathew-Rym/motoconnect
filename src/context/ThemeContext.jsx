@@ -1,5 +1,3 @@
-// src/context/ThemeContext.jsx
-// src/context/ThemeContext.jsx
 import { createContext, useContext, useEffect, useState } from 'react';
 
 const ThemeContext = createContext();
@@ -15,17 +13,9 @@ export const ThemeProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    const root = document.documentElement;
-
-    if (darkMode) {
-      root.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      root.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
-    }
-
-    console.log('[Theme] Current mode:', darkMode ? 'dark' : 'light');
+    localStorage.setItem('theme', darkMode ? 'dark' : 'light');
+    // Optional: Add a class to body for manual styling
+    document.body.className = darkMode ? 'bg-dark text-light' : 'bg-light text-dark';
   }, [darkMode]);
 
   return (
@@ -37,5 +27,3 @@ export const ThemeProvider = ({ children }) => {
 
 export const useTheme = () => useContext(ThemeContext);
 export { ThemeContext };
-// This code defines a ThemeContext for managing dark mode in a React application.
-// It provides a ThemeProvider component that toggles dark mode and stores the preference in localStorage

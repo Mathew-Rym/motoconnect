@@ -1,6 +1,7 @@
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { Link } from 'react-router-dom';
+import api from '../api/axios'; // ✅ Axios instance
 
 const ResetPassword = () => {
   const initialValues = {
@@ -11,32 +12,46 @@ const ResetPassword = () => {
     email: Yup.string().email('Invalid email address').required('Required'),
   });
 
-  const onSubmit = (values, { setSubmitting }) => {
-    console.log('Password reset requested for:', values.email);
-    setSubmitting(false);
+  const onSubmit = async (values, { setSubmitting, resetForm, setStatus }) => {
+    try {
+      await api.post('/reset-password', { email: values.email });
+
+      setStatus({ success: 'A reset link has been sent to your email.' });
+      resetForm();
+    } catch (error) {
+      const msg =
+        error.response?.data?.message || 'Failed to send reset email. Try again.';
+      setStatus({ error: msg });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Reset Password
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
+    <div className="container py-5 d-flex align-items-center justify-content-center min-vh-100 bg-light">
+      <div className="card shadow w-100" style={{ maxWidth: '400px' }}>
+        <div className="card-body">
+          <h2 className="card-title text-center mb-3">Reset Password</h2>
+          <p className="text-center text-muted mb-4">
             Enter your email to receive a password reset link
           </p>
-        </div>
-        <Formik
-          initialValues={initialValues}
-          validationSchema={validationSchema}
-          onSubmit={onSubmit}
-        >
-          {({ isSubmitting }) => (
-            <Form className="mt-8 space-y-6">
-              <div className="rounded-md shadow-sm space-y-4">
-                <div>
-                  <label htmlFor="email" className="sr-only">
+
+          <Formik
+            initialValues={initialValues}
+            validationSchema={validationSchema}
+            onSubmit={onSubmit}
+          >
+            {({ isSubmitting, status }) => (
+              <Form>
+                {status?.error && (
+                  <div className="alert alert-danger text-center py-2">{status.error}</div>
+                )}
+                {status?.success && (
+                  <div className="alert alert-success text-center py-2">{status.success}</div>
+                )}
+
+                <div className="mb-3">
+                  <label htmlFor="email" className="form-label">
                     Email address
                   </label>
                   <Field
@@ -44,30 +59,28 @@ const ResetPassword = () => {
                     name="email"
                     type="email"
                     autoComplete="email"
-                    required
-                    className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
-                    placeholder="Email address"
+                    className="form-control"
+                    placeholder="Enter your email"
                   />
-                  <ErrorMessage name="email" component="div" className="text-red-500 text-sm mt-1" />
+                  <ErrorMessage name="email" component="div" className="text-danger small mt-1" />
                 </div>
-              </div>
 
-              <div>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                  className="btn btn-primary w-100"
                 >
                   {isSubmitting ? 'Sending...' : 'Send Reset Link'}
                 </button>
-              </div>
-            </Form>
-          )}
-        </Formik>
-        <div className="text-center text-sm">
-          <Link to="/login" className="font-medium text-primary hover:text-orange-700">
-            Back to login
-          </Link>
+              </Form>
+            )}
+          </Formik>
+
+          <div className="text-center mt-3">
+            <Link to="/login" className="text-decoration-none text-primary fw-semibold">
+              Back to login
+            </Link>
+          </div>
         </div>
       </div>
     </div>

@@ -1,21 +1,19 @@
-// src/components/PartItem.jsx
 import { Link } from 'react-router-dom';
+
 
 function PartItem({ part }) {
   return (
-    <div className="border p-4 rounded shadow">
-      <h3 className="text-lg font-semibold">{part.name}</h3>
-      <p className="text-gray-600">Condition: {part.condition}</p>
-      <p className="text-green-600 font-medium">Ksh {part.price}</p>
-      <Link
-        to={`/parts/${part.id}`}
-        className="inline-block mt-2 text-indigo-600 hover:underline"
-      >
-        View Details
-      </Link>
+    <div className="card shadow-sm mb-3">
+      <div className="card-body">
+        <h5 className="card-title">{part.name}</h5>
+        <p className="card-text text-muted mb-1">Condition: {part.condition}</p>
+        <p className="card-text text-success fw-semibold">Ksh {part.price}</p>
+        <Link to={`/parts/${part.id}`} className="btn btn-link p-0 text-decoration-none">
+          View Details
+        </Link>
+      </div>
     </div>
   );
 }
 
 export default PartItem;
-// src/components/PartItem.jsx

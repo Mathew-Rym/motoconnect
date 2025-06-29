@@ -1,60 +1,81 @@
-// src/pages/Subscriptions.jsx
 import { useEffect, useState } from 'react';
-
-const mockSubscription = {
-  plan: 'Premium',
-  renews: '2025-01-01',
-  features: ['Unlimited listings', 'Priority support', 'Verified badge'],
-};
+import api from '../api/axios'; // ✅ Axios instance
 
 function Subscriptions() {
   const [subscription, setSubscription] = useState(null);
-  const [selectedPlan, setSelectedPlan] = useState('Premium');
+  const [selectedPlan, setSelectedPlan] = useState('');
 
+  // Fetch current subscription (mock → replace with real API call)
   useEffect(() => {
-    setTimeout(() => {
-      setSubscription(mockSubscription);
-      setSelectedPlan(mockSubscription.plan);
-    }, 300);
+    const fetchSubscription = async () => {
+      try {
+        const res = await api.get('/subscriptions/me'); // ⬅️ replace with your real endpoint
+        setSubscription(res.data);
+        setSelectedPlan(res.data.plan);
+      } catch (err) {
+        console.error('Error fetching subscription:', err);
+      }
+    };
+
+    fetchSubscription();
   }, []);
 
   const handleChange = (e) => setSelectedPlan(e.target.value);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert(`Subscription updated to: ${selectedPlan} (mock)`);
+    try {
+      await api.put('/subscriptions/me', { plan: selectedPlan }); // ⬅️ adjust endpoint
+      alert(`Subscription updated to: ${selectedPlan}`);
+    } catch (err) {
+      console.error('Update failed:', err);
+      alert('Failed to update subscription. Please try again.');
+    }
   };
 
-  if (!subscription) return <div className="p-8 text-center">Loading subscription...</div>;
+  if (!subscription) {
+    return (
+      <div className="container py-5 text-center">
+        <div className="spinner-border text-primary" role="status" />
+        <p className="mt-3">Loading subscription...</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="max-w-3xl mx-auto mt-16 px-4">
-      <h2 className="text-2xl font-bold mb-6">Your Subscription</h2>
-      <div className="bg-gray-100 p-4 rounded mb-6">
-        <p className="font-semibold">Current Plan: {subscription.plan}</p>
-        <p className="text-sm text-gray-600">Renews on: {subscription.renews}</p>
-        <ul className="list-disc pl-6 mt-2 text-gray-700">
-          {subscription.features.map((f, i) => <li key={i}>{f}</li>)}
-        </ul>
+    <div className="container py-5" style={{ maxWidth: '720px' }}>
+      <h2 className="mb-4 text-center">Your Subscription</h2>
+
+      <div className="card mb-4 shadow-sm">
+        <div className="card-body">
+          <h5 className="card-title">Current Plan: {subscription.plan}</h5>
+          <p className="card-subtitle mb-2 text-muted">Renews on: {subscription.renews}</p>
+          <ul className="list-group list-group-flush mt-3">
+            {subscription.features.map((feature, index) => (
+              <li className="list-group-item" key={index}>
+                {feature}
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block font-semibold">Switch Plan</label>
+      <form onSubmit={handleSubmit}>
+        <div className="mb-3">
+          <label htmlFor="planSelect" className="form-label fw-bold">Switch Plan</label>
           <select
+            id="planSelect"
             value={selectedPlan}
             onChange={handleChange}
-            className="w-full mt-1 p-2 border rounded"
+            className="form-select"
           >
             <option value="Free">Free</option>
             <option value="Standard">Standard - Ksh 500/mo</option>
             <option value="Premium">Premium - Ksh 1000/mo</option>
           </select>
         </div>
-        <button
-          type="submit"
-          className="bg-indigo-600 text-white px-6 py-2 rounded hover:bg-indigo-700"
-        >
+
+        <button type="submit" className="btn btn-primary w-100">
           Update Plan
         </button>
       </form>
