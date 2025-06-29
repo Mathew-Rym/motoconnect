@@ -1,4 +1,3 @@
-// src/context/AuthContext.jsx
 import { createContext, useState, useEffect } from 'react';
 
 export const AuthContext = createContext();
@@ -9,13 +8,21 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (error) {
+        console.error('Failed to parse stored user data:', error);
+        localStorage.removeItem('user'); // Clear invalid data
+        setUser(null);
+      }
     }
   }, []);
 
   const login = (userData) => {
-    setUser(userData);
-    localStorage.setItem('user', JSON.stringify(userData));
+    if (userData) {
+      setUser(userData);
+      localStorage.setItem('user', JSON.stringify(userData));
+    }
   };
 
   const logout = () => {

@@ -3,8 +3,9 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
-import api from '../api/axios'; // 🔥 Axios instance
+import api from '../api/axios'; // ✅ Axios instance
 
+// Schema validation
 const RegisterSchema = Yup.object().shape({
   username: Yup.string().min(3, 'Too short').required('Required'),
   email: Yup.string().email('Invalid email').required('Required'),
@@ -17,12 +18,23 @@ function Register() {
 
   const handleRegister = async (values, { setSubmitting, setErrors }) => {
     try {
-      const res = await api.post('/register', values); // 👈 Axios POST
-      login(res.data.user);
-      navigate('/dashboard');
+      const res = await api.post('/register', values);
+      const user = res.data.user || res.data;
+
+      if (user) {
+        login(user);
+        navigate('/dashboard');
+      } else {
+        throw new Error('Unexpected response format from server.');
+      }
     } catch (err) {
+      const status = err.response?.status;
       const message =
-        err.response?.data?.message || err.message || 'Registration failed';
+        status === 409
+          ? 'Email already exists. Please use a different one.'
+          : status === 0
+          ? 'CORS or network error. Check server connection.'
+          : err.response?.data?.message || err.message || 'Registration failed.';
       setErrors({ general: message });
     } finally {
       setSubmitting(false);

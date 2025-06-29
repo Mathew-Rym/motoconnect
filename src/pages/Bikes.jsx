@@ -10,7 +10,11 @@ function Bikes() {
     const fetchBikes = async () => {
       try {
         const response = await api.get('/bikes'); // ✅ Axios call
-        setBikes(response.data); // Adjust based on backend response shape
+        // Ensure response.data is an array, handle common API response shapes
+        const bikesData = Array.isArray(response.data) 
+          ? response.data 
+          : (response.data.bikes || response.data.data || []);
+        setBikes(bikesData);
       } catch (error) {
         console.error('Error fetching bikes:', error);
         setError('Failed to load bikes. Showing sample data.');
@@ -24,7 +28,7 @@ function Bikes() {
             year: 2021,
             price: 12000,
             mileage: 5000,
-            location: 'Nairobi'
+            location: 'Nairobi',
           },
           {
             id: 2,
@@ -33,7 +37,7 @@ function Bikes() {
             year: 2022,
             price: 5500,
             mileage: 3000,
-            location: 'Mombasa'
+            location: 'Mombasa',
           },
         ]);
       } finally {
@@ -52,24 +56,28 @@ function Bikes() {
       {error && <div className="alert alert-warning text-center">{error}</div>}
 
       <div className="row g-4">
-        {bikes.map((bike) => (
-          <div key={bike.id} className="col-sm-6 col-md-4">
-            <div className="card h-100 shadow-sm">
-              <div className="card-body d-flex flex-column justify-content-between">
-                <div>
-                  <h5 className="card-title">{bike.brand} {bike.model}</h5>
-                  <p className="card-text mb-1">Year: {bike.year}</p>
-                  <p className="card-text mb-1">Mileage: {bike.mileage.toLocaleString()} km</p>
-                  <p className="card-text mb-1">Location: {bike.location}</p>
-                  <p className="text-success fw-bold mt-2">Ksh {bike.price.toLocaleString()}</p>
+        {Array.isArray(bikes) ? (
+          bikes.map((bike) => (
+            <div key={bike.id} className="col-sm-6 col-md-4">
+              <div className="card h-100 shadow-sm">
+                <div className="card-body d-flex flex-column justify-content-between">
+                  <div>
+                    <h5 className="card-title">{bike.brand} {bike.model}</h5>
+                    <p className="card-text mb-1">Year: {bike.year}</p>
+                    <p className="card-text mb-1">Mileage: {bike.mileage.toLocaleString()} km</p>
+                    <p className="card-text mb-1">Location: {bike.location}</p>
+                    <p className="text-success fw-bold mt-2">Ksh {bike.price.toLocaleString()}</p>
+                  </div>
+                  <a href={`/bikes/${bike.id}`} className="btn btn-primary mt-3 w-100">
+                    View Details
+                  </a>
                 </div>
-                <a href={`/bikes/${bike.id}`} className="btn btn-primary mt-3 w-100">
-                  View Details
-                </a>
               </div>
             </div>
-          </div>
-        ))}
+          ))
+        ) : (
+          <p className="text-center">No bikes available.</p>
+        )}
       </div>
     </div>
   );

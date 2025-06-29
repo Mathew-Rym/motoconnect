@@ -11,10 +11,15 @@ function Community() {
     const fetchDiscussions = async () => {
       try {
         const res = await api.get('/discussions'); // ✅ Adjust the endpoint if needed
-        setDiscussions(res.data); // Assumes your backend returns an array of discussions
+        // Ensure res.data is an array, handle common API response shapes
+        const discussionsData = Array.isArray(res.data)
+          ? res.data
+          : (res.data.discussions || res.data.data || []);
+        setDiscussions(discussionsData);
       } catch (err) {
         setError('Failed to load discussions.');
-        console.error(err);
+        console.error('Error fetching discussions:', err);
+        setDiscussions([]); // Fallback to empty array on error
       } finally {
         setLoading(false);
       }
@@ -33,10 +38,13 @@ function Community() {
           {error && <div className="alert alert-danger">{error}</div>}
 
           <div className="list-group">
-            {!loading &&
+            {!loading && Array.isArray(discussions) ? (
               discussions.map((discussion) => (
                 <DiscussionItem key={discussion.id} discussion={discussion} />
-              ))}
+              ))
+            ) : (
+              !loading && !error && <p className="text-center">No discussions available.</p>
+            )}
           </div>
         </div>
       </div>

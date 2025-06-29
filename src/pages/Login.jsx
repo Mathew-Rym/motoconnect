@@ -3,7 +3,7 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
-import api from '../api/axios'; // ✅ Axios import
+import api from '../api/axios'; // ✅ Axios instance
 
 // Validation schema
 const LoginSchema = Yup.object().shape({
@@ -17,15 +17,31 @@ function Login() {
 
   const handleLogin = async (values, { setSubmitting, setErrors }) => {
     const { email, password } = values;
-    try {
-      const res = await api.post('/login', { email, password }); // ✅ Axios POST
 
-      // Assuming your backend returns { user: {...}, token: "..." }
-      login(res.data.user); // Set user in context
+    try {
+      const res = await api.post('/login', { email, password });
+
+      // ✅ Optionally store token if returned
+      if (res.data.token) {
+        localStorage.setItem('token', res.data.token);
+      }
+
+      login(res.data.user); // Store user in context
       navigate('/dashboard');
     } catch (err) {
-      const message =
-        err.response?.data?.message || 'Login failed. Please try again.';
+      const status = err.response?.status;
+      let message;
+
+      if (status === 401) {
+        message = 'Invalid email or password. Please try again.';
+      } else if (status === 0 || !err.response) {
+        message = 'Network error or CORS issue. Check your backend URL or ngrok tunnel.';
+      } else if (status >= 500) {
+        message = 'Server error. Please try again later.';
+      } else {
+        message = err.response?.data?.message || 'Login failed. Please try again.';
+      }
+
       setErrors({ general: message });
     } finally {
       setSubmitting(false);

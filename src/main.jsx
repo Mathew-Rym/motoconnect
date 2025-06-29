@@ -6,7 +6,7 @@ import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import Cart from './pages/Cart.jsx';
 import { CartProvider } from './context/CartContext';
-
+import ErrorBoundary from './components/ErrorBoundary';
 
 import 'bootstrap/dist/css/bootstrap.min.css';          // ✅ Bootstrap CSS
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';     // ✅ Bootstrap JS (with Popper)
@@ -20,7 +20,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <CartProvider>
       <AuthProvider>
         <ThemeProvider>
+          <ErrorBoundary>
           <App />
+          </ErrorBoundary>
         </ThemeProvider>
       </AuthProvider>
       </CartProvider>
