@@ -17,7 +17,7 @@ def create_app():
     db.init_app(app)
     migrate.init_app(app, db)
 
-    CORS(app)  
+    CORS(app, origins=["http://localhost:5174"])  
 
     # Import and register blueprints
     from app.routes.auth import auth_bp
