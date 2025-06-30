@@ -1,48 +1,34 @@
-import { useContext } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import { AuthContext } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
-import api from '../api/axios'; // ✅ Axios instance
+import { AuthContext } from '../context/AuthContext';
+import { useContext } from 'react';
 
-// Validation schema
 const LoginSchema = Yup.object().shape({
   email: Yup.string().email('Invalid email').required('Required'),
   password: Yup.string().min(6, 'Too Short!').required('Required'),
 });
 
 function Login() {
-  const { login } = useContext(AuthContext);
   const navigate = useNavigate();
+  const { login } = useContext(AuthContext);
 
-  const handleLogin = async (values, { setSubmitting, setErrors }) => {
-    const { email, password } = values;
-
+  const handleLogin = async (values, { setSubmitting, setFieldError }) => {
     try {
-      const res = await api.post('/login', { email, password });
-
-      // ✅ Optionally store token if returned
-      if (res.data.token) {
-        localStorage.setItem('token', res.data.token);
-      }
-
-      login(res.data.user); // Store user in context
+      // Simulate API call - replace with your actual authentication logic
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Mock user data - replace with actual user data from your API
+      const mockUser = {
+        email: values.email,
+        name: 'Demo User',
+        // Add other user properties as needed
+      };
+      
+      login(mockUser);
       navigate('/dashboard');
     } catch (err) {
-      const status = err.response?.status;
-      let message;
-
-      if (status === 401) {
-        message = 'Invalid email or password. Please try again.';
-      } else if (status === 0 || !err.response) {
-        message = 'Network error or CORS issue. Check your backend URL or ngrok tunnel.';
-      } else if (status >= 500) {
-        message = 'Server error. Please try again later.';
-      } else {
-        message = err.response?.data?.message || 'Login failed. Please try again.';
-      }
-
-      setErrors({ general: message });
+      setFieldError('password', 'Login failed. Please try again.');
     } finally {
       setSubmitting(false);
     }
@@ -52,20 +38,15 @@ function Login() {
     <div className="min-vh-100 d-flex justify-content-center align-items-center bg-light px-3">
       <div className="card shadow-lg p-4" style={{ maxWidth: '400px', width: '100%' }}>
         <h2 className="text-center mb-4">Welcome Back</h2>
+        <p className="text-center text-muted mb-4">Please enter your credentials</p>
 
         <Formik
           initialValues={{ email: '', password: '' }}
           validationSchema={LoginSchema}
           onSubmit={handleLogin}
         >
-          {({ isSubmitting, errors }) => (
+          {({ isSubmitting }) => (
             <Form>
-              {errors.general && (
-                <div className="alert alert-danger text-center py-2">
-                  {errors.general}
-                </div>
-              )}
-
               <div className="mb-3">
                 <label htmlFor="email" className="form-label">Email address</label>
                 <Field

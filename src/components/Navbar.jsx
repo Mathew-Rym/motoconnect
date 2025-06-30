@@ -35,9 +35,7 @@ function Navbar() {
             <li className="nav-item">
               <Link to="/community" className="nav-link">Community</Link>
             </li>
-            <li className="nav-item">
-              <Link to="/Cart" className="nav-link">Cart</Link>
-            </li>
+           
             
 
             {!user ? (

@@ -1,6 +1,11 @@
 import React from 'react';
 import { useCart } from '../context/CartContext';
 
+
+
+
+
+
 const Cart = () => {
   const { cartItems, removeFromCart, clearCart } = useCart();
 
