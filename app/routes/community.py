@@ -38,3 +38,9 @@ def add_comment(id):
     db.session.add(comment)
     db.session.commit()
     return jsonify({"message": "Comment added"}), 201
+
+
+
+
+
+
